@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-my $nomficGPS = "GPS_activity_1897740541.tcx";
-my $nomficIOS = "W_activity_1897727642.tcx";
+my $nomficGPS = "GPS_activity_1905540884.tcx";
+my $nomficIOS = "W_activity_1905536039.tcx";
 
 my $debug = 0;
 
@@ -50,8 +50,8 @@ while ( $ligneGPS = <$ficGPS> ) {
 	if ( $ligneGPS !~ /<Trackpoint>/ ) {
 		print "ko GPS $ligneGPS" if ( $debug >= 3 );
 	} else {
-		$ligneTrackpointGPS = <$ficGPS>;
-		$TimeGPS = $ligneGPS;
+		$ligneTrackpointGPS = $ligneGPS;
+		$TimeGPS = <$ficGPS>;
 		print "TIME = $TimeGPS" if ( $debug >= 3 );
 	
 		# *************** PATERN TIME IN IOS *****************
@@ -63,7 +63,10 @@ while ( $ligneGPS = <$ficGPS> ) {
 			if ( $ligneIOS =~ /$TimeGPS/ ) {
 				print "match $TimeGPS in IOS $ligneIOS" if ( $debug >= 3 );
 				$rechercheTime = 1;
+
 				print "<- GPS" if ( $debug >= 5 ); print $ligneTrackpointGPS;
+				print "<- GPS" if ( $debug >= 5 ); print $TimeGPS;
+				$ligneGPS = <$ficGPS>;
 
 				while ( $ligneGPS !~ /<Extensions>/ ) {
 					print "<- GPS" if ( $debug >= 4 ); print $ligneGPS;
@@ -119,23 +122,3 @@ while ( $ligneGPS = <$ficGPS> ) {
 
 close $ficGPS or die "Impossible de fermer $!";
 close $ficIOS or die "Impossible de fermer $!";
-
-open($ficGPS, $nomficGPS,) or die "Impossible d'ouvrir $!";
-
-until ( defined ( $ligneGPS = <$ficGPS> ) && ( $ligneGPS =~ /<\/Track>/ ) ) {
-}
-
-print "<- GPS " if ( $debug >= 4 ); print $ligneGPS;
-
-until ( defined ( $ligneGPS = <$ficGPS> ) && ( $ligneGPS =~ /<ns3:AvgSpeed>/ ) ) {
-	print "<- GPS " if ( $debug >= 4 ); print $ligneGPS;
-}
-
-open($ficIOS, $nomficIOS,) or die "Impossible d'ouvrir $!";
-
-until ( defined ( $ligneIOS = <$ficIOS> ) && ( $ligneIOS =~ /<ns3:AvgSpeed>/ ) ) {
-}
-
-while ( defined ( $ligneIOS = <$ficIOS> ) ) {
-	print "<- IOS " if ( $debug >= 4 ); print $ligneIOS;
-}
